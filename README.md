@@ -1,2 +1,2 @@
-# terrain-generator
-3d terrain generation
+# agent experiments
+experiments in programming an agent
