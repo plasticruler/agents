@@ -11,10 +11,10 @@ class Car {
     update(){        
         var mouse = createVector(mouseX,mouseY);                        
         this.acceleration = p5.Vector.sub(mouse,this.position);
-        this.acceleration.setMag(100); 
+        //this.acceleration.setMag(100); 
         
         this.velocity.add(this.acceleration);
-        this.velocity.limit(5);        
+        this.velocity.limit(this.topspeed);        
         
         this.position.add(this.velocity);        
         //line(mouse.x,mouse.y, this.position.x,this.position.y);
