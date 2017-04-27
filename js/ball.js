@@ -9,7 +9,8 @@ class Ball {
         this.location = createVector(x,y);
         this.velocity = createVector(random(-5,5),random(-5,5));//createVector(10.5,-2);
         this.acceleration = createVector();
-        this.topspeed=5;                        
+        this.topspeed=5; 
+        
     }
     update(){
         var mouse = createVector(mouseX,mouseY);        
@@ -19,9 +20,8 @@ class Ball {
         this.velocity.add(this.acceleration);
         this.velocity.limit(5);
         
-        this.location.add(this.velocity);
-        this.bounce();
-        
+        this.location.add(this.velocity);        
+        this.bounce();        
     }
     display(){        
         fill(this.colour);

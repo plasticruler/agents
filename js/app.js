@@ -1,34 +1,26 @@
 /* configs */
 var CANVAS_SIZE = 800;
 var FRAME_RATE =32;
-var balls = [];
+var entities = [];
 function setup() {
     var MAX_RADIUS = 50;
-    var BALL_COUNT=1;
+    var ENTITY_COUNT=30;
     createCanvas(CANVAS_SIZE, CANVAS_SIZE);        
     frameRate(FRAME_RATE);   
-    for(var i=0; i < BALL_COUNT; i++) 
+    for(var i=0;  i < ENTITY_COUNT; i++) 
     {
         var randomColour = color(random(255),random(255),random(255));
-        randomColour =random(['red','white','blue','green']);
-        balls.push(new Ball(random(width/2),random(height/2),random(10,MAX_RADIUS),randomColour));         
-    }
-    var car = new Car(createVector(50,50),15,45);    
-    balls.push(new Car(createVector(50,50),15,45));    
-    balls.push(new Car(createVector(100,110),15,45));    
-    
-        
+        //randomColour =random(['red','white','blue','green']);
+        //entities.push(new Ball(random(width/2),random(height/2),random(10,MAX_RADIUS),randomColour));         
+        entities.push(new Car(createVector(random(10,CANVAS_SIZE/2),random(10,CANVAS_SIZE/2)),15,35));    
+    }                        
 }
 function drawTrack(){
-    balls.forEach((b)=>{
-        //b.update();         
-        //b.display();
-    });
-
-    for(var i=0; i < balls.length; i++)    {
-        balls[i].update();
-        balls[i].display(true);
-    }
+    entities.forEach((b)=>{
+        b.applyBehaviours(entities);
+        b.update();        
+        b.display(true);
+    });    
 }
 function draw() {
     background(50);  
