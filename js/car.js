@@ -1,13 +1,13 @@
 class Car {
     constructor(position, w,l){
         this.position = position;        
-        this.velocity = createVector(0,0);
+        this.velocity = createVector(random(-1,15),random(-1,30));
         this.acceleration = createVector(0,0);
 
-        this.topspeed = random(2,5);
-        this.maxForce = 0.2;
+        this.topspeed = random(1,5);
+        this.maxForce = 0.35;
 
-
+        this.neighbourDistance = 15;
         this.w=w;
         this.l=l;        
         this.rotation = 0;        
@@ -21,16 +21,61 @@ class Car {
     applyForce(force){
         this.acceleration.add(force);
     }
+    borders() {
+    if (this.position.x < -this.w) this.position.x = width+this.w;
+    if (this.position.y < -this.l) this.position.y = height+this.l;
+    if (this.position.x > width+this.w) this.position.x = -this.w;
+    if (this.position.y > height+this.l) this.position.y = -this.y;
+  }
+    flock(cars){
+        var sep = this.seperate(cars);
+        var ali = this.align(cars);
+        var coh = this.cohesion(cars);
+
+        sep.mult(1.5);
+        ali.mult(1.0);
+        coh.mult(1.0);
+
+        this.applyForce(sep);
+        this.applyForce(ali);
+        this.applyForce(coh);
+
+        this.applyForce(this.seek(createVector(mouseX,mouseY)));
+        this.borders();
+    }
     applyBehaviours(cars){                            
-        var seperateForce = this.seperate(cars,75);    
-        seperateForce.mult(2);
-        this.applyForce(seperateForce);
-        
+        var seperateForce = this.seperate(cars,this.neighbourDistance);            
         var seekForce = this.seek(createVector(mouseX,mouseY));                    
+        
+        seperateForce.mult(2);                
         seekForce.mult(1);        
         this.applyForce(seekForce);
+        this.applyForce(seperateForce);
     }
-    seek(target){
+    align(cars){        //OK
+        var sum = createVector(0,0);
+        var nd = 5.0;
+        var count =0;
+        cars.forEach((c)=>{
+            var d = p5.Vector.dist(this.position,c.position);
+            if ((d > 0) && (d < nd)){
+                sum.add(c.velocity);
+                count++;
+            }
+        });
+        if (count>0){
+            sum.div(count);
+            sum.normalize();
+            sum.mult(this.topspeed);
+            var steer = p5.Vector.sub(sum,this.velocity);
+            steer.limit(this.maxForce);
+            return steer;
+        }
+        else{
+            return createVector(0,0);
+        }
+    }
+    seek(target){ //OK
         var desired = target.sub(this.position);
         desired.normalize();
         desired.mult(this.topspeed);
@@ -40,31 +85,52 @@ class Car {
         steer.limit(this.maxForce);        
         return steer;        
     }
-    seperate(cars,desiredSeperation){
-        if (!desiredSeperation)
-            desiredSeperation=20;        
+    cohesion(cars){ //OK
         
         var sum = createVector(0,0);
         var count =0;
-
+        var nd = 25.0;
         cars.forEach((c)=>{
-            var d = p5.Vector.dist(this.position, c.position);
-            if ((d>0) && (d < desiredSeperation)){
-                var diff = p5.Vector.sub(this.position, c.position);
-                diff.normalize();
-                diff.div(d);
-                sum.add(diff);
+            var d = p5.Vector.dist(this.position,c.position);
+            if ((d > 0) && (d < nd)){
+                sum.add(c.velocity);
                 count++;
             }
         });
         if (count>0){
-            sum.div(count);
-            sum.normalize();
-            sum.mult(this.topspeed);
-            sum.sub(this.velocity);
-            sum.limit(this.maxForce);
+            sum.div(count);                        
+            return this.seek(sum);
         }
-        return sum;
+        else{
+            return createVector(0,0);
+        }
+    }
+    seperate(cars){        
+        var steer = createVector();
+        var count = 0;
+        var nd = 25.0;
+        cars.forEach((c)=>{
+               var d = p5.Vector.dist(this.position,c.position) ;
+               if ((d>0) && (d < this.nd)){
+                   var diff = p5.Vector.sub(this.position.c.position);
+                   diff.normalize();
+                   diff.div(d);
+                   steer.add(diff);
+                   count++;
+               }
+        });
+
+        if (count>0){
+            steer.div(count);
+        }
+        if (steer.mag() > 0){
+            steer.normalize();
+            steer.mult(this.topspeed);
+            steer.sub(this.velocity);
+            steer.limit(this.maxForce);
+        }
+        return steer;
+        
     }
     approach(target,boundary){
         var desired = target.sub(this.position);
