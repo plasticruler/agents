@@ -1,11 +1,11 @@
 class Car {
     constructor(position, w,l){
         this.position = position;        
-        this.velocity = createVector(random(-1,15),random(-1,30));
+        this.velocity = createVector(random(-3,15),random(-3,15));
         this.acceleration = createVector(0,0);
 
         this.topspeed = random(1,5);
-        this.maxForce = 0.35;
+        this.maxForce = 0.05;
 
         this.neighbourDistance = 15;
         this.w=w;
@@ -13,36 +13,52 @@ class Car {
         this.rotation = 0;        
         this.colour = color(random(0,255),random(0,255),random(0,255));        
     }
-    isInCircle(target, radius) {
+    applyForce(force){
+        this.acceleration.add(force);
+    }
+
+    isInCircle(target, radius) { //OK
             //check if the distance from the center of the circle the point is less than the radius
             return Math.sqrt(Math.pow(target.x - this. position.x,2) + Math.pow(target.y - this.position.y, 2)) < radius;
     }
 
-    applyForce(force){
-        this.acceleration.add(force);
-    }
-    borders() {
+    borders() { //OK
     if (this.position.x < -this.w) this.position.x = width+this.w;
     if (this.position.y < -this.l) this.position.y = height+this.l;
     if (this.position.x > width+this.w) this.position.x = -this.w;
     if (this.position.y > height+this.l) this.position.y = -this.y;
   }
-    flock(cars){
+    
+    run(cars){
+        this.flock(cars);
+        this.update();
+        this.borders();
+        this.display();
+    }
+    flock(cars){ //OK
+        //this.applyForce(this.seek(createVector(mouseX,mouseY)));
+
         var sep = this.seperate(cars);
         var ali = this.align(cars);
         var coh = this.cohesion(cars);
 
-        sep.mult(1.5);
-        ali.mult(1.0);
-        coh.mult(1.0);
+        sep.mult(2.5);
+        ali.mult(1.4);
+        coh.mult(0.5);
 
         this.applyForce(sep);
         this.applyForce(ali);
         this.applyForce(coh);
 
-        this.applyForce(this.seek(createVector(mouseX,mouseY)));
+        
         this.borders();
     }
+     update(){ //OK
+        this.velocity.add(this.acceleration);
+        this.velocity.limit(this.topspeed);
+        this.position.add(this.velocity);
+        this.acceleration.mult(0);
+    } 
     applyBehaviours(cars){                            
         var seperateForce = this.seperate(cars,this.neighbourDistance);            
         var seekForce = this.seek(createVector(mouseX,mouseY));                    
@@ -54,7 +70,7 @@ class Car {
     }
     align(cars){        //OK
         var sum = createVector(0,0);
-        var nd = 5.0;
+        var nd = 50.0;
         var count =0;
         cars.forEach((c)=>{
             var d = p5.Vector.dist(this.position,c.position);
@@ -89,7 +105,7 @@ class Car {
         
         var sum = createVector(0,0);
         var count =0;
-        var nd = 25.0;
+        var nd = 50.0;
         cars.forEach((c)=>{
             var d = p5.Vector.dist(this.position,c.position);
             if ((d > 0) && (d < nd)){
@@ -106,13 +122,13 @@ class Car {
         }
     }
     seperate(cars){        
-        var steer = createVector();
+        var steer = createVector(0,0);
         var count = 0;
-        var nd = 25.0;
+        var nd = 35.0;
         cars.forEach((c)=>{
                var d = p5.Vector.dist(this.position,c.position) ;
-               if ((d>0) && (d < this.nd)){
-                   var diff = p5.Vector.sub(this.position.c.position);
+               if ((d > 0) && (d < nd)){
+                   var diff = p5.Vector.sub(this.position,c.position);
                    diff.normalize();
                    diff.div(d);
                    steer.add(diff);
@@ -151,12 +167,7 @@ class Car {
         steer.limit(this.maxForce);        
         return steer;        
     }
-    update(){                                                                            
-        this.velocity.add(this.acceleration);
-        this.velocity.limit(this.topspeed);
-        this.position.add(this.velocity);
-        this.acceleration.mult(0);
-    }    
+      
     rotate(degrees){
         this.rotation = degrees;
     }

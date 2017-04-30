@@ -7,7 +7,7 @@ class Ball {
         this.colour = colour;        
         
         this.location = createVector(x,y);
-        this.velocity = createVector(random(-5,5),random(-5,5));//createVector(10.5,-2);
+        this.velocity = createVector(random(-5,15),random(-5,5));//createVector(10.5,-2);
         this.acceleration = createVector();
         this.topspeed=5; 
         
