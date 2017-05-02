@@ -29,8 +29,8 @@ class Car {
     if (this.position.y > height+this.l) this.position.y = -this.y;
   }
     
-    run(cars,s,a,c){
-        this.flock(cars,s,a,c);
+    run(cars,f){
+        this.flock(cars,f);
         this.update();
         this.borders();
         this.display();
@@ -47,8 +47,7 @@ class Car {
         {
                 if (f.fm)
                 {
-                    this.applyForce(this.seek(createVector(mouseX,mouseY)));
-                    console.log("following mouse");
+                    this.applyForce(this.seek(createVector(mouseX,mouseY)));                    
                 }
                 seperationRatio = f.s;
                 alignmentRatio = f.a;
