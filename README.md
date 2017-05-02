@@ -8,7 +8,7 @@ Most of the code comes from watching the videos in [this](https://www.youtube.co
  It needs a bit of a refactor and I'm known to check things simply in so that I can work on it on my laptop.
 
  TODO:
- - I read that a quad-tree might improve performance because it gets dog-slow any time you go over 100 or so.
+ - I read that a quad-tree might improve performance because it gets dog-slow any time you go over 100 or so as comparisons are O(n^2) without using an appropriate data structure to filter entities in a local area.
 
 
 
