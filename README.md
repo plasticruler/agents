@@ -1,5 +1,7 @@
 # agent experiments
-Experiments in programming an autonamous agent
+Experiments in programming an autonamous agent.
+
+View live [here](https://skrillex581.github.io/agents/).
 
 ![alt tag](https://raw.githubusercontent.com/skrillex581/agents/master/agents.gif)
 
