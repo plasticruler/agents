@@ -1,10 +1,10 @@
 class Car {
     constructor(position, w,l){
         this.position = position;        
-        this.velocity = createVector(random(-3,15),random(-3,15));
+        this.velocity = createVector(random(-2,15),random(-2,15));
         this.acceleration = createVector(0,0);
 
-        this.topspeed = random(1,5);
+        this.topspeed = random(1,8);
         this.maxForce = 0.05;
 
         this.neighbourDistance = 15;
@@ -29,22 +29,42 @@ class Car {
     if (this.position.y > height+this.l) this.position.y = -this.y;
   }
     
-    run(cars){
-        this.flock(cars);
+    run(cars,s,a,c){
+        this.flock(cars,s,a,c);
         this.update();
         this.borders();
         this.display();
     }
-    flock(cars){ //OK
-        //this.applyForce(this.seek(createVector(mouseX,mouseY)));
-
-        var sep = this.seperate(cars);
-        var ali = this.align(cars);
-        var coh = this.cohesion(cars);
-
-        sep.mult(2.5);
-        ali.mult(1.4);
-        coh.mult(0.5);
+    flock(cars,f){ //OK                        
+        let seperationRatio=2.5;
+        let alignmentRatio=1.4;
+        let cohesionRatio=0.5;
+        let seperationDistance = 50;
+        let alignmentDistance = 35;
+        let cohesionDistance = 25;
+        
+        if (f)
+        {
+                if (f.fm)
+                {
+                    this.applyForce(this.seek(createVector(mouseX,mouseY)));
+                    console.log("following mouse");
+                }
+                seperationRatio = f.s;
+                alignmentRatio = f.a;
+                cohesionRatio = f.c;
+                seperationDistance = f.sd;
+                alignmentDistance = f.ad;
+                cohesionDistance = f.cd;
+        }                    
+        
+        let sep = this.seperate(cars,seperationDistance);
+        let ali = this.align(cars,alignmentDistance);
+        let coh = this.cohesion(cars,cohesionDistance);
+            
+        sep.mult(seperationRatio);
+        ali.mult(alignmentRatio);
+        coh.mult(cohesionRatio);
 
         this.applyForce(sep);
         this.applyForce(ali);
@@ -68,13 +88,12 @@ class Car {
         this.applyForce(seekForce);
         this.applyForce(seperateForce);
     }
-    align(cars){        //OK
-        var sum = createVector(0,0);
-        var nd = 50.0;
+    align(cars,a){        //OK
+        var sum = createVector(0,0);        
         var count =0;
         cars.forEach((c)=>{
             var d = p5.Vector.dist(this.position,c.position);
-            if ((d > 0) && (d < nd)){
+            if ((d > 0) && (d < a)){
                 sum.add(c.velocity);
                 count++;
             }
@@ -101,14 +120,13 @@ class Car {
         steer.limit(this.maxForce);        
         return steer;        
     }
-    cohesion(cars){ //OK
+    cohesion(cars,a){ //OK
         
         var sum = createVector(0,0);
-        var count =0;
-        var nd = 50.0;
+        var count =0;        
         cars.forEach((c)=>{
             var d = p5.Vector.dist(this.position,c.position);
-            if ((d > 0) && (d < nd)){
+            if ((d > 0) && (d < a)){
                 sum.add(c.velocity);
                 count++;
             }
@@ -121,13 +139,12 @@ class Car {
             return createVector(0,0);
         }
     }
-    seperate(cars){        
+    seperate(cars,a){                       
         var steer = createVector(0,0);
-        var count = 0;
-        var nd = 35.0;
+        var count = 0;        
         cars.forEach((c)=>{
                var d = p5.Vector.dist(this.position,c.position) ;
-               if ((d > 0) && (d < nd)){
+               if ((d > 0) && (d < a)){
                    var diff = p5.Vector.sub(this.position,c.position);
                    diff.normalize();
                    diff.div(d);

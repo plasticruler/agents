@@ -2,9 +2,9 @@ class Flock{
     constructor(boids){
         this.boids = boids;
     }
-    run(){
+    run(f){
         this.boids.forEach((c)=>{
-            c.run(this.boids);
+            c.run(this.boids,f);
         })
     }
     addBoid(c){
