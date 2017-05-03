@@ -12,6 +12,8 @@ var flockBehaviour = {
     ad:35,
     cd:20
 };
+var treeProto= d3.quadtree.prototype;
+treeProto.findAll = tree_findAll;
 function setup() {
     var MAX_RADIUS = 50;
     var ENTITY_COUNT = 20;
@@ -42,8 +44,6 @@ function setup() {
         followMouseChangedCallback();
     });
 
-
-
     frameRate(FRAME_RATE);   
     
     for(var i=0;  i < ENTITY_COUNT; i++) 
@@ -52,7 +52,9 @@ function setup() {
         entities.push(new Car(createVector(random(10,CANVAS_SIZE/2),random(10,CANVAS_SIZE/2)),5,10));    
     }                        
     flock = new Flock(entities);
+    
 }
+
 function followMouseChangedCallback(){
     flockBehaviour.fm = controlPanel.getValue("Follow mouse");    
 }

@@ -29,13 +29,13 @@ class Car {
     if (this.position.y > height+this.l) this.position.y = -this.y;
   }
     
-    run(cars,f){
-        this.flock(cars,f);
+    run(cars,f,t){
+        this.flock(cars,f,t);
         this.update();
         this.borders();
         this.display();
     }
-    flock(cars,f){ //OK                        
+    flock(cars,f,tree){ //OK                        
         let seperationRatio=2.5;
         let alignmentRatio=1.4;
         let cohesionRatio=0.5;
@@ -56,10 +56,10 @@ class Car {
                 alignmentDistance = f.ad;
                 cohesionDistance = f.cd;
         }                    
-        
-        let sep = this.seperate(cars,seperationDistance);
-        let ali = this.align(cars,alignmentDistance);
-        let coh = this.cohesion(cars,cohesionDistance);
+        //only pass in the car collection for surrounding cars
+        let sep = this.seperate(tree.findAll(this.position.x,this.position.y,seperationDistance),seperationDistance);
+        let ali = this.align(tree.findAll(this.position.x,this.position.y,alignmentDistance),alignmentDistance);
+        let coh = this.cohesion(tree.findAll(this.position.x,this.position.y,cohesionDistance),cohesionDistance);
             
         sep.mult(seperationRatio);
         ali.mult(alignmentRatio);
@@ -90,6 +90,7 @@ class Car {
     align(cars,a){        //OK
         var sum = createVector(0,0);        
         var count =0;
+        //instead of checking each car we will use a quadtree
         cars.forEach((c)=>{
             var d = p5.Vector.dist(this.position,c.position);
             if ((d > 0) && (d < a)){
@@ -138,7 +139,7 @@ class Car {
             return createVector(0,0);
         }
     }
-    seperate(cars,a){                       
+    seperate(cars,a){          
         var steer = createVector(0,0);
         var count = 0;        
         cars.forEach((c)=>{
