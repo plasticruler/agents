@@ -1,6 +1,7 @@
 class Flock{
-    constructor(boids){
+    constructor(boids,obstacles){
         this.boids = boids;
+        this.obstacles = obstacles;
     
     
     }
@@ -18,7 +19,7 @@ class Flock{
             .y(this.y)           
         this.tree.addAll(this.boids);    
         this.boids.forEach((c)=>{
-            c.run(this.boids,f,this.tree);
+            c.run(this.boids,f,this.tree,this.obstacles);            
         });        
     }
     addBoid(c){
