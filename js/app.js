@@ -31,7 +31,9 @@ function setup() {
     
 
     createCanvas(CANVAS_SIZE, CANVAS_SIZE);        
-    controlPanel = QuickSettings.create(CANVAS_SIZE+10,20,"Options");    
+    
+    controlPanel = QuickSettings.create(CANVAS_SIZE+10,10,"Options");    
+    
     controlPanel.addRange("Seperation force",0,5,flockBehaviour.s,0.1,()=>{
         settingChangedCallback();
     });
@@ -66,7 +68,7 @@ function setup() {
     controlPanel.addBoolean("Show Centre",flockBehaviour.showCentre,()=>{
         settingChangedCallback();
     });
-
+controlPanel.addHTML("About","<ul><li>Refresh page to randomize things up a bit.</li><li>Drag mouse to create more boids.</li></ul>")
     frameRate(FRAME_RATE);   
     
     for(var i=0;  i < ENTITY_COUNT; i++) 
