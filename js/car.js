@@ -28,13 +28,13 @@ class Car {
     if (this.position.y > height+this.l) this.position.y = -this.l;
   }
     
-    run(cars,f,t,obstacles){
-        this.flock(cars,f,t,obstacles);
+    run(f,t,obstacles){
+        this.flock(f,t,obstacles);
         this.update();
         this.borders();
         this.display(f);
     }
-    flock(cars,f,tree,obstacles){ //OK                        
+    flock(f,tree,obstacles){ //OK                        
         let seperationRatio=1.5;
         let alignmentRatio=1.0;
         let cohesionRatio=1.0;
