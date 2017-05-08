@@ -1,7 +1,7 @@
 class Car {
     constructor(position, w,l){
         this.position = position;        
-        this.velocity = createVector(random(-2,2),random(-2,2));
+        this.velocity = createVector(random(-1,1),random(-1,1));
         this.acceleration = createVector(0,0);
 
         this.topspeed = 3.0;//random(1,3);

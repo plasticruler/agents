@@ -1,6 +1,6 @@
 /* configs */
-var CANVAS_SIZE = 1200;
-var FRAME_RATE =32;
+var CANVAS_SIZE = 620;
+var FRAME_RATE =60;
 var entities = [];
 var obstacles = [];
 var flock;
@@ -26,8 +26,8 @@ var treeProto= d3.quadtree.prototype;
 treeProto.findAll = tree_findAll;
 function setup() {
     var MAX_RADIUS = 50;
-    var ENTITY_COUNT = 50;
-    var OBSTACLE_COUNT = 35;
+    var ENTITY_COUNT = 30;
+    var OBSTACLE_COUNT = random(0,10);
     
 
     createCanvas(CANVAS_SIZE, CANVAS_SIZE);        
