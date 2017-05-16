@@ -3,8 +3,11 @@ var CANVAS_SIZE = 620;
 var FRAME_RATE =60;
 var entities = [];
 var obstacles = [];
+var eatables = [];
 var flock;
+var startingTime = new Date();
 var controlPanel;
+var statusPanel;
 var flockBehaviour = {
     s:1.5,
     a:1.0,
@@ -20,18 +23,22 @@ var flockBehaviour = {
     showAlignmentDistance:false,
     maxForce:0.05,
     topSpeed:3.0,
-    avoidanceRadius:25
+    avoidanceRadius:25,
+    showFoodDistance:false
 };
 var treeProto= d3.quadtree.prototype;
 treeProto.findAll = tree_findAll;
 function setup() {
     var MAX_RADIUS = 50;
-    var ENTITY_COUNT = 30;
-    var OBSTACLE_COUNT = random(0,10);
-    
-
-    createCanvas(CANVAS_SIZE, CANVAS_SIZE);        
-    
+    var ENTITY_COUNT = 5;
+    var OBSTACLE_COUNT = 3;//random(0,10);
+    var EATABLE_COUNT = random(20,50);
+    var x =20, y=20;
+    statusPanel = new StatusPanel(x,y);
+    statusPanel.addLine("Age",0,30);
+    statusPanel.addLine("CR");
+    statusPanel.addLine("Food",0,EATABLE_COUNT);     
+    createCanvas(CANVAS_SIZE, CANVAS_SIZE);            
     controlPanel = QuickSettings.create(CANVAS_SIZE+10,10,"Options");    
     
     controlPanel.addRange("Seperation force",0,5,flockBehaviour.s,0.1,()=>{
@@ -62,7 +69,11 @@ function setup() {
     controlPanel.addBoolean("Show Cohesion Distance",flockBehaviour.showCohesionDistance,()=>{
         settingChangedCallback();
     });
-    controlPanel.addBoolean("Follow mouse",flockBehaviour.followMouse,()=>{
+    controlPanel.addBoolean("Show Food Distance",flockBehaviour.showFoodDistance,()=>{
+        settingChangedCallback();
+    });
+    
+    controlPanel.addBoolean("Follow Mouse",flockBehaviour.followMouse,()=>{
         settingChangedCallback();
     });
     controlPanel.addBoolean("Show Centre",flockBehaviour.showCentre,()=>{
@@ -79,13 +90,15 @@ controlPanel.addHTML("About","<ul><li>Refresh page to randomize things up a bit.
     for(var i=0;  i < OBSTACLE_COUNT; i++) 
     {        
         obstacles.push(new Obstacle(createVector(random(10,CANVAS_SIZE),random(10,CANVAS_SIZE)),flockBehaviour.avoidanceRadius));    
-    }                        
-    flock = new Flock(entities,obstacles);
+    }             
+    for(var i=0;i < EATABLE_COUNT; i++)           
+    {
+        eatables.push(new Eatable(createVector(random(10,CANVAS_SIZE),random(10,CANVAS_SIZE)),10,0));    
+    }
+    flock = new Flock(entities,obstacles,eatables);
     
 }
-function settingChangedCallback(){
-    console.log(controlPanel);
-    flockBehaviour.fm = controlPanel.getValue("Follow mouse");    
+function settingChangedCallback(){        
     flockBehaviour.sd = parseFloat(controlPanel.getValue("Seperation distance"));
     flockBehaviour.ad = parseFloat(controlPanel.getValue("Alignment distance"));
     flockBehaviour.cd = parseFloat(controlPanel.getValue("Cohesion distance"));
@@ -97,6 +110,8 @@ function settingChangedCallback(){
     flockBehaviour.showSeperationDistance = controlPanel.getValue("Show Seperation Distance");
     flockBehaviour.showCentre = controlPanel.getValue("Show Centre");
     flockBehaviour.followMouse = controlPanel.getValue("Follow Mouse");
+    flockBehaviour.showFoodDistance = controlPanel.getValue("Show Food Distance");
+    
 }
 
 function mouseDragged(){
@@ -113,6 +128,10 @@ function draw() {
     flock.run(flockBehaviour);    
     obstacles.forEach(o=>{
         o.display();
-    })
+    }); 
+    noFill();    
+    statusPanel.setCaptionValue("Age",Math.round((new Date()-this.startingTime)/1000));
+    statusPanel.setCaptionValue("Food",flock.food.length);
+    statusPanel.display();           
     //console.log(mouseX, mouseY)       ;
 }
