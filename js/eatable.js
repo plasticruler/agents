@@ -11,7 +11,9 @@ class Eatable {
     forceType(){
         return this.forceType;
     }
-    
+    isAlive(){
+        return !this.isDead;
+    }
     kill(){
         this.isDead=true;
     }

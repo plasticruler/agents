@@ -93,7 +93,7 @@ class Car {
         var items = this.foodTree.findAll(this.position.x,this.position.y,this.seeFoodDistance);                
         if (items.length>0)
         {            
-            if (this.isInCircle(items[0],this.mouthSize))
+            if (this.isInCircle(items[0],this.mouthSize) && !items[0].isAlive()) //only eat available food
             {                                
                 this.cycleAge-=items[0].foodValue;
                 items[0].kill();                                                      
