@@ -14,4 +14,5 @@ FEATURES:
     - Food items are inserted into the simulation each second with a fixed probability.
     - A number of parameters control boid behaviour.
  TODO:
+    - Sometimes food is placed too close to the obstacles and the boids die trying to get something they're programmed to avoid.
     - Mating and evolution.
