@@ -8,6 +8,9 @@ class Obstacle {
     forceType(){
         return this.forceType;
     }
+    run(){
+        this.display();
+    }
     display(){     
             push();                                                 
                 strokeWeight(2);                                                         

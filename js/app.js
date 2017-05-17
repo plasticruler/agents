@@ -1,14 +1,15 @@
 /* configs */
-var CANVAS_SIZE = 620;
-var FRAME_RATE =60;
-var entities = [];
-var obstacles = [];
-var eatables = [];
-var flock;
-var startingTime = new Date();
-var controlPanel;
-var statusPanel;
-var flockBehaviour = {
+let CANVAS_SIZE = 620;
+let FRAME_RATE =60;
+let entities = [];
+let obstacles = [];
+let eatables = [];
+let flock;
+let tickCounter = 0;
+let startingTime = new Date();
+let controlPanel;
+let statusPanel;
+let flockBehaviour = {
     s:1.5,
     a:1.0,
     c:1.0,
@@ -24,7 +25,9 @@ var flockBehaviour = {
     maxForce:0.05,
     topSpeed:3.0,
     avoidanceRadius:25,
-    showFoodDistance:false
+    continueFlockingWhileHungry:false,
+    showFoodDistance:false,
+    showMouthSize:false
 };
 var treeProto= d3.quadtree.prototype;
 treeProto.findAll = tree_findAll;
@@ -36,7 +39,7 @@ function setup() {
     var x =20, y=20;
     statusPanel = new StatusPanel(x,y);
     statusPanel.addLine("Age",0,30);
-    statusPanel.addLine("CR");
+    statusPanel.addLine("Pop.",0,ENTITY_COUNT);
     statusPanel.addLine("Food",0,EATABLE_COUNT);     
     createCanvas(CANVAS_SIZE, CANVAS_SIZE);            
     controlPanel = QuickSettings.create(CANVAS_SIZE+10,10,"Options");    
@@ -70,6 +73,12 @@ function setup() {
         settingChangedCallback();
     });
     controlPanel.addBoolean("Show Food Distance",flockBehaviour.showFoodDistance,()=>{
+        settingChangedCallback();
+    });
+    controlPanel.addBoolean("Flock while hungry",flockBehaviour.continueFlockingWhileHungry,()=>{
+        settingChangedCallback();
+    });
+    controlPanel.addBoolean("Show Mouth Size", flockBehaviour.showMouthSize, ()=>{
         settingChangedCallback();
     });
     
@@ -110,8 +119,9 @@ function settingChangedCallback(){
     flockBehaviour.showSeperationDistance = controlPanel.getValue("Show Seperation Distance");
     flockBehaviour.showCentre = controlPanel.getValue("Show Centre");
     flockBehaviour.followMouse = controlPanel.getValue("Follow Mouse");
+    flockBehaviour.continueFlockingWhileHungry = controlPanel.getValue("Flock while hungry");
     flockBehaviour.showFoodDistance = controlPanel.getValue("Show Food Distance");
-    
+    flockBehaviour.showMouthSize = controlPanel.getValue("Show Mouth Size");    
 }
 
 function mouseDragged(){
@@ -121,17 +131,42 @@ function mouseDragged(){
 function mouseClicked(){
 
 }
+function shouldGenerateFood(){
+    return random(0,1) <= 0.4; //40% chance of a new food item being generated each second
+}
+function shouldGenerateBoid(){
+    return random(0,1) <= 0.3;   //30% chance each second of population growth
+}
+function updateInternals(){    
+
+    var elapsed = new Date() - startingTime;
+    var timeDiff = Math.round(elapsed / 1000);
+    tickCounter++;
+    if (!(tickCounter % FRAME_RATE)) //frame rate is x-times per second
+    {        
+        if (shouldGenerateFood())
+        {
+            flock.food.push(new Eatable(createVector(random(10,CANVAS_SIZE),random(10,CANVAS_SIZE)),10,0));
+        }
+        if (shouldGenerateBoid())
+        {
+            flock.boids.push(new Car(createVector(random(10,CANVAS_SIZE),random(10,CANVAS_SIZE)),5,10));    
+        }
+        tickCounter=0;        
+    }    
+}
 
 function draw() {
+    updateInternals();    
     background(50);  
     angleMode(DEGREES)                      ;
     flock.run(flockBehaviour);    
     obstacles.forEach(o=>{
         o.display();
     }); 
-    noFill();    
-    statusPanel.setCaptionValue("Age",Math.round((new Date()-this.startingTime)/1000));
+    noFill();            
+    statusPanel.setCaptionValue("Age",Math.round((new Date()-startingTime)/1000));
     statusPanel.setCaptionValue("Food",flock.food.length);
-    statusPanel.display();           
-    //console.log(mouseX, mouseY)       ;
+    statusPanel.setCaptionValue("Pop.",flock.boids.length);
+    statusPanel.display();    
 }

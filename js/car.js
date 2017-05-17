@@ -49,7 +49,9 @@ class Car {
         let seperationDistance = 25;
         let alignmentDistance = 50;
         let cohesionDistance = 40;
+        let continueFlockingWhileHungry=false;
         this.foodTree=foodTree;
+        
         this.eatWhatItCan();
         if (f) {
             if (f.followMouse) {
@@ -62,6 +64,7 @@ class Car {
             alignmentDistance = f.ad;
             cohesionDistance = f.cd;
             avoidanceRatio = f.avoidanceRatio;
+            continueFlockingWhileHungry=f.continueFlockingWhileHungry;
         }
         this.seperationDistance = seperationDistance;
         this.alignmentDistance = alignmentDistance;
@@ -81,7 +84,8 @@ class Car {
         if (this.isHungry())
         {
             this.seekFood(foodTree)
-            return; //forget about flocking
+            if (!continueFlockingWhileHungry)
+                return; //forget about flocking
         }                            
         this.applyForce(sep);
         this.applyForce(ali);
@@ -93,7 +97,7 @@ class Car {
         var items = this.foodTree.findAll(this.position.x,this.position.y,this.seeFoodDistance);                
         if (items.length>0)
         {            
-            if (this.isInCircle(items[0],this.mouthSize) && !items[0].isAlive()) //only eat available food
+            if (this.isInCircle(items[0],this.mouthSize) && items[0].isAlive()) //only eat available food
             {                                
                 this.cycleAge-=items[0].foodValue;
                 items[0].kill();                                                      
@@ -292,13 +296,17 @@ class Car {
         }
         if (f.showFoodDistance)
         {
-            stroke('pink');
+            stroke('orange');
             ellipse(0, 0, this.seeFoodDistance);
         }
         
 
-        stroke('green');
-        ellipse(0, 0, this.mouthSize);
+        if (f.showMouthSize)
+        {
+            stroke('blue');        
+            ellipse(0, 0, this.mouthSize);
+        }
+        
 
         fill(this.colour);
         if (this.isHungry())

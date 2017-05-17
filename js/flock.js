@@ -37,9 +37,11 @@ class Flock {
         
         this.food.forEach((f)=>
         {
-            f.run();;
+            f.run();
         })
-        
+        this.obstacles.forEach((o) => {
+            o.run();
+        });
         this.boids.forEach((c) => {
             c.run(f, boidTree, obstacleTree,foodTree);
         });
