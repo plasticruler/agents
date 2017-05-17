@@ -7,6 +7,11 @@ class Eatable {
             this.isDead=false;     
             this.foodValue = random(5,20);
 
+
+            this.start = new Date();
+            this.tickCounter = 0;
+            this.cycleAge = 0;
+            this.lifeLimit = 150;            
     }
     forceType(){
         return this.forceType;
@@ -17,7 +22,22 @@ class Eatable {
     kill(){
         this.isDead=true;
     }
+    updateInternals(){
+        var elapsed = new Date() - this.start;
+        var timeDiff = Math.round(elapsed / 1000);
+        this.tickCounter++;
+        if (this.tickCounter === FRAME_RATE) //frame rate is x-times per second
+        {
+            this.cycleAge++;
+            this.tickCounter = 0;
+        }
+
+        if (this.cycleAge > this.lifeLimit - 1) {
+            this.kill(); //the food has gone stale
+        }
+    }
     run(){
+        this.updateInternals();
         this.display();
     }
     display(){     
