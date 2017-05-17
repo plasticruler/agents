@@ -7,7 +7,11 @@ View live [here](https://skrillex581.github.io/agents/).
 
 Most of the code comes from watching the videos in [this](https://www.youtube.com/playlist?list=PLRqwX-V7Uu6YHt0dtyf4uiw8tKOxQLvlW) playlist. All I did was rewrite most of it but used ES2015 and added some features to improve my conceptual understanding of the principles.
 
- It needs a bit of a refactor and I'm known to check things simply in so that I can work on it on my laptop.
-
+ 
+FEATURES:
+    - Boids die after a number seconds unless they eat something which restores life by adding a random number of life points.
+    - Boids are born each second with a fixed probability. My plan is for them to eventually mate and pass on their phenotypes.
+    - Food items are inserted into the simulation each second with a fixed probability.
+    - A number of parameters control boid behaviour.
  TODO:
- - ~~I read that a quad-tree might improve performance because it gets dog-slow any time you go over 100 or so.~~ (Using the d3-quadtree implementation. At this point d3-quadtree does not support a findAll method but this [link](https://bl.ocks.org/lwthatcher/eefa923ab427d293d44f67057521c0f9) has an extension.)
+    - Mating and evolution.
