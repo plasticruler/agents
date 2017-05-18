@@ -5,7 +5,7 @@ class Eatable {
             this.eatableType = eatableType||0;//no effect
             this.radius = radius||5;
             this.isDead=false;     
-            this.foodValue = random(5,20);
+            this.foodValue = 5;//random(5,20);
 
 
             this.start = new Date();

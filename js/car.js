@@ -1,12 +1,23 @@
 
 class Car {
-    constructor(position, w, l, lifeLimit) {
+    constructor(position, w, l, lifeLimit, chromoSomes) {
+        this.chromoSomes = {'FOOD_SEARCH_DISTANCE':random(30,80),
+                            'TOP_SPEED':2.0,
+                            'MAX_FORCE':random(0.05, 0.08),
+                            'FLOCK_BEHAVIOUR':0, 
+                            'MOUTH_SIZE':random(5,8),
+                            'ENDURANCE_FACTOR':random(0.95,1.05)} || chromoSomes;
+
+        this.topspeed = this.chromoSomes.TOP_SPEED;
+        this.maxForce = this.chromoSomes.MAX_FORCE;
+        this.seeFoodDistance = this.chromoSomes.FOOD_SEARCH_DISTANCE; //not shared                
+        this.mouthSize= this.chromoSomes.MOUTH_SIZE;
+        this.enduranceFactor = this.ENDURANCE_FACTOR; //does hunger make him weaker or stronger?
+        this.flockBehaviour = this.FLOCK_BEHAVIOUR;
+        
         this.position = position;
         this.velocity = createVector(random(-1, 1), random(-1, 1));
         this.acceleration = createVector(0, 0);
-
-        this.topspeed = 2.0;//random(1,3);
-        this.maxForce = random(0.05, 0.05);
 
         this.w = w;
         this.l = l;
@@ -15,10 +26,40 @@ class Car {
         this.start = new Date();
         this.tickCounter = 0;
         this.cycleAge = 0;
-        this.lifeLimit = lifeLimit || 50;
-        this.isDead = false;
-        this.seeFoodDistance = random(30,80); //not shared                
-        this.mouthSize=10;
+        this.lifeLimit = lifeLimit || 25;
+        this.isDead = false;                
+        
+    }
+    returnTrueXPercentUniform(x){
+        return random(0,1) < x;
+    }
+    mate(c){ //returns a baby produced as a result of a crossing between c and this
+
+    }
+    getMutation(){
+        var MUTATION_RATE = 0.05;
+        var GENOME_PRESERVATION_RATE = 0.2;
+        if ( this.returnTrueXPercentUniform(MUTATION_RATE)) //5% change of mutation appearing
+        {
+            return {'FOOD_SEARCH_DISTANCE': this.returnTrueXPercentUniform(GENOME_PRESERVATION_RATE)?random(30,80):this.chromoSomes.FOOD_SEARCH_DISTANCE, //20% of a something 'new'
+                            'TOP_SPEED':this.returnTrueXPercentUniform(GENOME_PRESERVATION_RATE)?random(2,4):this.chromoSomes.TOP_SPEED,
+                            'MAX_FORCE':this.returnTrueXPercentUniform(GENOME_PRESERVATION_RATE)?random(0.05, 0.08):this.chromoSomes.MAX_FORCE,
+                            'FLOCK_BEHAVIOUR':this.returnTrueXPercentUniform(GENOME_PRESERVATION_RATE)?Math.floor(random(1,3)):this.chromoSomes.FLOCK_BEHAVIOUR, 
+                            'MOUTH_SIZE':this.returnTrueXPercentUniform(GENOME_PRESERVATION_RATE)?Math.floor(random(5,8)):this.chromoSomes.MOUTH_SIZE,
+                            'ENDURANCE_FACTOR':this.returnTrueXPercentUniform(GENOME_PRESERVATION_RATE)?random(0.95,1.05):this.chromoSomes.ENDURANCE_FACTOR} ;
+        }
+        else
+        {
+             return {'FOOD_SEARCH_DISTANCE':this.chromoSomes.FOOD_SEARCH_DISTANCE,
+                     'TOP_SPEED':this.chromoSomes.TOP_SPEED,
+                     'MAX_FORCE':this.chromoSomes.MAX_FORCE,
+                     'FLOCK_BEHAVIOUR':this.chromoSomes.FLOCK_BEHAVIOUR, 
+                     'MOUTH_SIZE':this.chromoSomes.MOUTH_SIZE,
+                     'ENDURANCE_FACTOR':this.chromoSomes.ENDURANCE_FACTOR};
+        }
+    }
+    fitnessScore(){
+        return this.cycleAge; //because it has survived for so long must mean it's strong
     }
     applyForce(force) {
         this.acceleration.add(force);
@@ -105,7 +146,10 @@ class Car {
         }       
     }
     isHungry(){
-        return (this.lifeLimit-this.cycleAge) < this.lifeLimit*0.90;
+        return this.energyLevel() < 0.80;
+    }
+    energyLevel(){
+        return (this.lifeLimit-this.cycleAge) / this.lifeLimit;
     }
     seekFood() { //will seek food if hungry        
         if (this.isHungry()) {
@@ -121,8 +165,9 @@ class Car {
 
             
             if (this.isInCircle(foodItems[0],this.seeFoodDistance))
-            {
-                this.applyForce(this.seek(foodItems[0].position));
+            {                
+                this.applyForce(this.seek(foodItems[0].position, this.topspeed*this.energyLevel())); //this should become a force taking into account 'attractive' power of the food, and also how much enery the boid has
+
                 line(this.position.x,this.position.y,foodItems[0].position.x,foodItems[0].position.y )
             }
             return true;
@@ -159,13 +204,13 @@ class Car {
             return createVector(0, 0);
         }
     }
-    seek(target,speed) { //OK        
+    seek(target,speed,force) { //OK        
         var desired = p5.Vector.sub(target, this.position);
         desired.normalize();
         desired.mult(speed||this.topspeed);
 
         var steer = p5.Vector.sub(desired, this.velocity);
-        steer.limit(this.maxForce);
+        steer.limit(this.maxForce||force);
         return steer;
     }
     cohesion(cars, a) { //OK

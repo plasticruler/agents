@@ -1,6 +1,7 @@
 /* configs */
 let CANVAS_SIZE = 620;
 let FRAME_RATE =60;
+let LIFE_LIMIT_FOR_ENTITIES=100;
 let entities = [];
 let obstacles = [];
 let eatables = [];
@@ -34,13 +35,13 @@ treeProto.findAll = tree_findAll;
 function setup() {
     var MAX_RADIUS = 50;
     var ENTITY_COUNT = 5;
-    var OBSTACLE_COUNT = 3;//random(0,10);
-    var EATABLE_COUNT = random(20,50);
+    var OBSTACLE_COUNT = random(0,10);
+    var EATABLE_COUNT = random(ENTITY_COUNT,60);
     var x =20, y=20;
     statusPanel = new StatusPanel(x,y);
-    statusPanel.addLine("Age",0,30);
-    statusPanel.addLine("Pop.",0,ENTITY_COUNT);
-    statusPanel.addLine("Food",0,EATABLE_COUNT);     
+    statusPanel.addLine("Age");
+    statusPanel.addLine("Pop.");
+    statusPanel.addLine("Food");     
     createCanvas(CANVAS_SIZE, CANVAS_SIZE);            
     controlPanel = QuickSettings.create(CANVAS_SIZE+10,10,"Options");    
     
@@ -51,7 +52,7 @@ function setup() {
         settingChangedCallback();
     });
     controlPanel.addRange("Cohesion force",0,4,flockBehaviour.c,0.1,()=>{
-        cohesionChangedCallback();
+        settingChangedCallback();
     });
 
     controlPanel.addRange("Seperation distance",0,100,flockBehaviour.sd,5,()=>{
@@ -75,7 +76,7 @@ function setup() {
     controlPanel.addBoolean("Show Food Distance",flockBehaviour.showFoodDistance,()=>{
         settingChangedCallback();
     });
-    controlPanel.addBoolean("Flock while hungry",flockBehaviour.continueFlockingWhileHungry,()=>{
+    controlPanel.addBoolean("Flock despite hunger",flockBehaviour.continueFlockingWhileHungry,()=>{
         settingChangedCallback();
     });
     controlPanel.addBoolean("Show Mouth Size", flockBehaviour.showMouthSize, ()=>{
@@ -94,7 +95,8 @@ controlPanel.addHTML("About","<ul><li>Refresh page to randomize things up a bit.
     for(var i=0;  i < ENTITY_COUNT; i++) 
     {
         var randomColour = color(random(255),random(255),random(255));        
-        entities.push(new Car(createVector(random(10,CANVAS_SIZE),random(10,CANVAS_SIZE)),5,10));    
+        entities.push(new Car(createVector(random(10,CANVAS_SIZE),
+                              random(10,CANVAS_SIZE)),5,10,LIFE_LIMIT_FOR_ENTITIES));    
     }                        
     for(var i=0;  i < OBSTACLE_COUNT; i++) 
     {        
@@ -119,7 +121,7 @@ function settingChangedCallback(){
     flockBehaviour.showSeperationDistance = controlPanel.getValue("Show Seperation Distance");
     flockBehaviour.showCentre = controlPanel.getValue("Show Centre");
     flockBehaviour.followMouse = controlPanel.getValue("Follow Mouse");
-    flockBehaviour.continueFlockingWhileHungry = controlPanel.getValue("Flock while hungry");
+    flockBehaviour.continueFlockingWhileHungry = controlPanel.getValue("Flock despite hunger");
     flockBehaviour.showFoodDistance = controlPanel.getValue("Show Food Distance");
     flockBehaviour.showMouthSize = controlPanel.getValue("Show Mouth Size");    
 }
@@ -132,7 +134,7 @@ function mouseClicked(){
 
 }
 function shouldGenerateFood(){
-    return random(0,1) <= 0.4; //40% chance of a new food item being generated each second
+    return random(0,1) <= 0.8; //40% chance of a new food item being generated each second
 }
 function shouldGenerateBoid(){
     return random(0,1) <= 0.3;   //30% chance each second of population growth
@@ -150,7 +152,8 @@ function updateInternals(){
         }
         if (shouldGenerateBoid())
         {
-            flock.boids.push(new Car(createVector(random(10,CANVAS_SIZE),random(10,CANVAS_SIZE)),5,10));    
+            flock.boids.push(new Car(createVector(random(10,CANVAS_SIZE),
+                              random(10,CANVAS_SIZE)),5,10,LIFE_LIMIT_FOR_ENTITIES));    
         }
         tickCounter=0;        
     }    
@@ -166,7 +169,7 @@ function draw() {
     }); 
     noFill();            
     statusPanel.setCaptionValue("Age",Math.round((new Date()-startingTime)/1000));
-    statusPanel.setCaptionValue("Food",flock.food.length);
+    statusPanel.setCaptionValue("Food",flock.food.length,flock.boids.length);
     statusPanel.setCaptionValue("Pop.",flock.boids.length);
     statusPanel.display();    
 }
