@@ -11,7 +11,7 @@ class Eatable {
             this.start = new Date();
             this.tickCounter = 0;
             this.cycleAge = 0;
-            this.lifeLimit = 150;            
+            this.lifeLimit = 75;            
     }
     forceType(){
         return this.forceType;

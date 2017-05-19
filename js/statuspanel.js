@@ -20,7 +20,7 @@ class StatusPanel {
                     invertIndicator:invertIndicator||false
             });
     }
-    setCaptionValue(c,value,max){                
+    setCaptionValue(c,value){                
         let n = this.data.filter(
             (d)=>{            
             return d.caption==c
@@ -28,8 +28,7 @@ class StatusPanel {
         );        
         if (n && n[0])
         {
-            n[0].value=value;
-            n[0].max=max;
+            n[0].value=value;            
         }
     }
     display(){        
@@ -46,13 +45,14 @@ class StatusPanel {
                 fill(255);
                 text(c.caption,this.x+5,myY);
                 fill(c.invertIndicator?'red':'green');
-                rect(this.MAX_LABEL_WIDTH,myY-10,this.BAR_WIDTH,10);
-                fill(!c.invertIndicator?'red':'green');
+                rect(this.MAX_LABEL_WIDTH,myY-10,this.BAR_WIDTH,10);                
                 if (c.showBar)
-                {                    
-                    let j = (c.value/c.max)*this.BAR_WIDTH;
-                    j = Math.min(j,this.BAR_WIDTH);
-                    rect(this.MAX_LABEL_WIDTH,myY-10,j,10);                
+                {                               
+                    fill((!c.invertIndicator)?'red':'green');                    
+                    //fill('red');                    
+                    let j = Math.floor((c.value/c.max)*this.BAR_WIDTH);                    
+                    j = Math.min(j,this.BAR_WIDTH);                                  ;
+                    rect(this.MAX_LABEL_WIDTH,myY-10,j,10);                                                        
                 }                
                 fill(255);
                 text(c.value,this.MAX_LABEL_WIDTH+10,myY);

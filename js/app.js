@@ -1,7 +1,7 @@
 /* configs */
-let CANVAS_SIZE = 620;
+let CANVAS_SIZE = 800;
 let FRAME_RATE =60;
-let LIFE_LIMIT_FOR_ENTITIES=100;
+let LIFE_LIMIT_FOR_ENTITIES=50;
 let entities = [];
 let obstacles = [];
 let eatables = [];
@@ -28,20 +28,22 @@ let flockBehaviour = {
     avoidanceRadius:25,
     continueFlockingWhileHungry:false,
     showFoodDistance:false,
-    showMouthSize:false
+    showMouthSize:false,
+    generateRandom:true
 };
 var treeProto= d3.quadtree.prototype;
 treeProto.findAll = tree_findAll;
 function setup() {
     var MAX_RADIUS = 50;
-    var ENTITY_COUNT = 5;
+    var ENTITY_COUNT = 20;
     var OBSTACLE_COUNT = random(0,10);
-    var EATABLE_COUNT = random(ENTITY_COUNT,60);
+    var EATABLE_COUNT = random(20,ENTITY_COUNT);
     var x =20, y=20;
-    statusPanel = new StatusPanel(x,y);
-    statusPanel.addLine("Age");
+    statusPanel = new StatusPanel(x,y,100);
+    statusPanel.addLine("W. Age");
     statusPanel.addLine("Pop.");
     statusPanel.addLine("Food");     
+    statusPanel.addLine("Avg Age",0,LIFE_LIMIT_FOR_ENTITIES,true,false);    
     createCanvas(CANVAS_SIZE, CANVAS_SIZE);            
     controlPanel = QuickSettings.create(CANVAS_SIZE+10,10,"Options");    
     
@@ -86,6 +88,9 @@ function setup() {
     controlPanel.addBoolean("Follow Mouse",flockBehaviour.followMouse,()=>{
         settingChangedCallback();
     });
+    controlPanel.addBoolean("Birth new",flockBehaviour.generateRandom,()=>{
+        settingChangedCallback();
+    });
     controlPanel.addBoolean("Show Centre",flockBehaviour.showCentre,()=>{
         settingChangedCallback();
     });
@@ -124,6 +129,7 @@ function settingChangedCallback(){
     flockBehaviour.continueFlockingWhileHungry = controlPanel.getValue("Flock despite hunger");
     flockBehaviour.showFoodDistance = controlPanel.getValue("Show Food Distance");
     flockBehaviour.showMouthSize = controlPanel.getValue("Show Mouth Size");    
+    flockBehaviour.generateRandom = controlPanel.getValue("Birth new");
 }
 
 function mouseDragged(){
@@ -134,10 +140,12 @@ function mouseClicked(){
 
 }
 function shouldGenerateFood(){
-    return random(0,1) <= 0.8; //40% chance of a new food item being generated each second
+    return random(0,1) <= 0.95; //95% chance of a new food item being generated each second
 }
 function shouldGenerateBoid(){
-    return random(0,1) <= 0.3;   //30% chance each second of population growth
+    if (flockBehaviour.generateRandom)
+        return random(0,1) <= 0.3;   //30% chance each second of population growth
+    return false;
 }
 function updateInternals(){    
 
@@ -168,8 +176,13 @@ function draw() {
         o.display();
     }); 
     noFill();            
-    statusPanel.setCaptionValue("Age",Math.round((new Date()-startingTime)/1000));
-    statusPanel.setCaptionValue("Food",flock.food.length,flock.boids.length);
+    statusPanel.setCaptionValue("W. Age",Math.round((new Date()-startingTime)/1000));
+    statusPanel.setCaptionValue("Food",flock.food.length);
     statusPanel.setCaptionValue("Pop.",flock.boids.length);
+    statusPanel.setCaptionValue("Avg Age",Math.floor(flock.boids.reduce(
+        (p,c)=>{            
+            return p+c.totalAge;
+        }
+        ,0)/flock.boids.length));
     statusPanel.display();    
 }

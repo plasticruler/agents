@@ -26,6 +26,7 @@ class Car {
         this.start = new Date();
         this.tickCounter = 0;
         this.cycleAge = 0;
+        this.totalAge=0;
         this.lifeLimit = lifeLimit || 25;
         this.isDead = false;                
         
@@ -124,6 +125,7 @@ class Car {
 
         if (this.isHungry())
         {
+            
             this.seekFood(foodTree)
             if (!continueFlockingWhileHungry)
                 return; //forget about flocking
@@ -155,19 +157,19 @@ class Car {
         if (this.isHungry()) {
                
             var foodItems = this.foodTree.findAll(this.position.x,this.position.y,this.seeFoodDistance);            
+            if (foodItems.length===0)
+                return false;            
+
             foodItems.forEach((f)=>
             {                
                 if (this.isInCircle(f,this.seeFoodDistance))
                     f.eatableType=1;//change colour of food to show it has been 'seen;
             })
-            if (foodItems.length===0)
-                return false;            
-
+            
             
             if (this.isInCircle(foodItems[0],this.seeFoodDistance))
             {                
-                this.applyForce(this.seek(foodItems[0].position, this.topspeed*this.energyLevel())); //this should become a force taking into account 'attractive' power of the food, and also how much enery the boid has
-
+                this.applyForce(this.seek(foodItems[0].position, this.topspeed*this.energyLevel(),this.maxForce*1.5)); //this should become a force taking into account 'attractive' power of the food, and also how much enery the boid has
                 line(this.position.x,this.position.y,foodItems[0].position.x,foodItems[0].position.y )
             }
             return true;
@@ -210,7 +212,7 @@ class Car {
         desired.mult(speed||this.topspeed);
 
         var steer = p5.Vector.sub(desired, this.velocity);
-        steer.limit(this.maxForce||force);
+        steer.limit(force||this.maxForce);
         return steer;
     }
     cohesion(cars, a) { //OK
@@ -258,7 +260,7 @@ class Car {
         return steer;
 
     }
-    avoidObstacles(obstacles) { //we only in nearby obstacles        
+    avoidObstacles(obstacles) { //we only check nearby obstacles        
         var steer = createVector(0, 0);
         var count = 0;
         obstacles.forEach((o) => {
@@ -309,6 +311,7 @@ class Car {
         {
             this.cycleAge++;
             this.tickCounter = 0;
+            this.totalAge++;
         }
 
         if (this.cycleAge > this.lifeLimit - 1) {
