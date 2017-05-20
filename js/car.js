@@ -67,7 +67,7 @@ class Car {
     }
 
     isInCircle(target, radius) { //OK               
-        return  this.position.dist(target.position) < radius;
+        return  this.position.dist(target.position) < radius/2.0;
     }
 
     borders() { //OK
@@ -324,8 +324,7 @@ class Car {
         var direction = this.velocity.heading() - 90;
         this.rotation = direction;
         this.updateInternals(this.foodTree);
-        push();
-        strokeWeight(2);
+        push();        
         noFill();
         translate(this.position.x, this.position.y);  //make the origin 0,0
         strokeWeight(1);

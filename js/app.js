@@ -35,7 +35,7 @@ var treeProto= d3.quadtree.prototype;
 treeProto.findAll = tree_findAll;
 function setup() {
     var MAX_RADIUS = 50;
-    var ENTITY_COUNT = 20;
+    var ENTITY_COUNT = 1;
     var OBSTACLE_COUNT = random(0,10);
     var EATABLE_COUNT = random(20,ENTITY_COUNT);
     var x =20, y=20;
@@ -43,7 +43,9 @@ function setup() {
     statusPanel.addLine("W. Age");
     statusPanel.addLine("Pop.");
     statusPanel.addLine("Food");     
+    statusPanel.addLine("Oldest");
     statusPanel.addLine("Avg Age",0,LIFE_LIMIT_FOR_ENTITIES,true,false);    
+
     createCanvas(CANVAS_SIZE, CANVAS_SIZE);            
     controlPanel = QuickSettings.create(CANVAS_SIZE+10,10,"Options");    
     
@@ -157,6 +159,7 @@ function updateInternals(){
         if (shouldGenerateFood())
         {
             flock.food.push(new Eatable(createVector(random(10,CANVAS_SIZE),random(10,CANVAS_SIZE)),10,0));
+            flock.food.push(new Eatable(createVector(random(10,CANVAS_SIZE),random(10,CANVAS_SIZE)),10,0));
         }
         if (shouldGenerateBoid())
         {
@@ -179,6 +182,8 @@ function draw() {
     statusPanel.setCaptionValue("W. Age",Math.round((new Date()-startingTime)/1000));
     statusPanel.setCaptionValue("Food",flock.food.length);
     statusPanel.setCaptionValue("Pop.",flock.boids.length);
+       statusPanel.setCaptionValue("Oldest",Math.max.apply(Math,flock.boids.map(function(o){           
+           return  o.cycleAge;})));
     statusPanel.setCaptionValue("Avg Age",Math.floor(flock.boids.reduce(
         (p,c)=>{            
             return p+c.totalAge;
