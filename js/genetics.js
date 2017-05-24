@@ -18,10 +18,7 @@ class Genetics{
             Object.keys(this.chromosomes).forEach((k)=>{
             m[k]=1;
             });
-        }
-
-        
-
+        }        
 
         if ( this.returnTrueXPercentUniform(MUTATION_RATE)) //5% change of mutation appearing
         {

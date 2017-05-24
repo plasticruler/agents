@@ -6,6 +6,7 @@ class Car {
                             'MAX_FORCE':random(0.05, 0.08),
                             'FLOCK_BEHAVIOUR':0, 
                             'MOUTH_SIZE':random(5,8),
+                            'FOOD_PREFERANCE':random(0,3),
                             'ENDURANCE_FACTOR':random(0.95,1.05)} || chromoSomes;
 
         this.topspeed = this.chromoSomes.TOP_SPEED;
@@ -16,7 +17,7 @@ class Car {
         this.flockBehaviour = this.FLOCK_BEHAVIOUR;
         
         this.position = position;
-        this.velocity = createVector(random(-1, 1), random(-1, 1));
+        this.velocity = createVector(random(-1, 2), random(-1, 2));
         this.acceleration = createVector(0, 0);
 
         this.w = w;
@@ -28,8 +29,8 @@ class Car {
         this.cycleAge = 0;
         this.totalAge=0;
         this.lifeLimit = lifeLimit || 25;
-        this.isDead = false;                
-        
+        this.isDead = false;    
+        this.foodCounts = {};                   
     }
     returnTrueXPercentUniform(x){
         return random(0,1) < x;
@@ -43,6 +44,7 @@ class Car {
         if ( this.returnTrueXPercentUniform(MUTATION_RATE)) //5% change of mutation appearing
         {
             return {'FOOD_SEARCH_DISTANCE': this.returnTrueXPercentUniform(GENOME_PRESERVATION_RATE)?random(30,80):this.chromoSomes.FOOD_SEARCH_DISTANCE, //20% of a something 'new'
+                            'FOOD_PREFERANCE':this.returnTrueXPercentUniform(GENOME_PRESERVATION_RATE)?random(0,4):this.chromoSomes.FOOD_PREFERANCE,
                             'TOP_SPEED':this.returnTrueXPercentUniform(GENOME_PRESERVATION_RATE)?random(2,4):this.chromoSomes.TOP_SPEED,
                             'MAX_FORCE':this.returnTrueXPercentUniform(GENOME_PRESERVATION_RATE)?random(0.05, 0.08):this.chromoSomes.MAX_FORCE,
                             'FLOCK_BEHAVIOUR':this.returnTrueXPercentUniform(GENOME_PRESERVATION_RATE)?Math.floor(random(1,3)):this.chromoSomes.FLOCK_BEHAVIOUR, 
@@ -56,6 +58,7 @@ class Car {
                      'MAX_FORCE':this.chromoSomes.MAX_FORCE,
                      'FLOCK_BEHAVIOUR':this.chromoSomes.FLOCK_BEHAVIOUR, 
                      'MOUTH_SIZE':this.chromoSomes.MOUTH_SIZE,
+                     'FOOD_PREFERANCE':this.chromoSomes.FOOD_PREFERANCE,
                      'ENDURANCE_FACTOR':this.chromoSomes.ENDURANCE_FACTOR};
         }
     }
@@ -142,7 +145,13 @@ class Car {
         {            
             if (this.isInCircle(items[0],this.mouthSize) && items[0].isAlive()) //only eat available food
             {                                
-                this.cycleAge-=items[0].foodValue;
+                //we want to keep track of how many of what food type it ate
+                //so that we can build a frequency map which will be used for preference development later on
+                //we will use a threshold that will initiate the learning..
+                this.cycleAge-=items[0].getFoodValue();                              
+                if (!(items[0].eatableType in this.foodCounts))
+                    this.foodCounts[items[0].eatableType]=0;                
+                this.foodCounts[items[0].eatableType]++;//increment count of what was eaten                
                 items[0].kill();                                                      
             }                
         }       
@@ -162,14 +171,14 @@ class Car {
 
             foodItems.forEach((f)=>
             {                
-                if (this.isInCircle(f,this.seeFoodDistance))
-                    f.eatableType=1;//change colour of food to show it has been 'seen;
+                //if (this.isInCircle(f,this.seeFoodDistance))
+                //    f.eatableType=1;//change colour of food to show it has been 'seen;
             })
             
             
             if (this.isInCircle(foodItems[0],this.seeFoodDistance))
             {                
-                this.applyForce(this.seek(foodItems[0].position, this.topspeed*this.energyLevel(),this.maxForce*1.5)); //this should become a force taking into account 'attractive' power of the food, and also how much enery the boid has
+                this.applyForce(this.seek(foodItems[0].position, this.topspeed*this.energyLevel(),this.maxForce*2.0)); //this should become a force taking into account 'attractive' power of the food, and also how much enery the boid has
                 line(this.position.x,this.position.y,foodItems[0].position.x,foodItems[0].position.y )
             }
             return true;

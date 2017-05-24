@@ -31,14 +31,23 @@ let flockBehaviour = {
     showMouthSize:false,
     generateRandom:true
 };
-var treeProto= d3.quadtree.prototype;
+let treeProto= d3.quadtree.prototype;
 treeProto.findAll = tree_findAll;
+let FOOD_GENERATION_FREQUENCY = { //numbers dont have to add up to 100
+    0:10,
+    1:75,
+    2:10,
+    3:5
+}
+let foodCounter = {};
+let foodGenerator = new randombyfrequency(FOOD_GENERATION_FREQUENCY);
 function setup() {
     var MAX_RADIUS = 50;
     var ENTITY_COUNT = 1;
     var OBSTACLE_COUNT = random(0,10);
     var EATABLE_COUNT = random(20,ENTITY_COUNT);
     var x =20, y=20;
+    foodGenerator.normalise();
     statusPanel = new StatusPanel(x,y,100);
     statusPanel.addLine("W. Age");
     statusPanel.addLine("Pop.");
@@ -111,10 +120,16 @@ controlPanel.addHTML("About","<ul><li>Refresh page to randomize things up a bit.
     }             
     for(var i=0;i < EATABLE_COUNT; i++)           
     {
-        eatables.push(new Eatable(createVector(random(10,CANVAS_SIZE),random(10,CANVAS_SIZE)),10,0));    
+        eatables.push(new Eatable(createVector(random(10,CANVAS_SIZE),random(10,CANVAS_SIZE)),10, foodGenerator.generate()));    
     }
     flock = new Flock(entities,obstacles,eatables);
     
+}
+function mode(arr){
+    return arr.sort((a,b) =>
+          arr.filter(v => v===a).length
+        - arr.filter(v => v===b).length
+    ).pop();
 }
 function settingChangedCallback(){        
     flockBehaviour.sd = parseFloat(controlPanel.getValue("Seperation distance"));
@@ -142,7 +157,7 @@ function mouseClicked(){
 
 }
 function shouldGenerateFood(){
-    return random(0,1) <= 0.95; //95% chance of a new food item being generated each second
+    return random() <= 0.95; //95% chance of a new food item being generated each second
 }
 function shouldGenerateBoid(){
     if (flockBehaviour.generateRandom)
@@ -155,18 +170,19 @@ function updateInternals(){
     var timeDiff = Math.round(elapsed / 1000);
     tickCounter++;
     if (!(tickCounter % FRAME_RATE)) //frame rate is x-times per second
-    {        
+    {                       
+        var foodType;                            
         if (shouldGenerateFood())
-        {
-            flock.food.push(new Eatable(createVector(random(10,CANVAS_SIZE),random(10,CANVAS_SIZE)),10,0));
-            flock.food.push(new Eatable(createVector(random(10,CANVAS_SIZE),random(10,CANVAS_SIZE)),10,0));
+        {                
+            flock.food.push(new Eatable(createVector(random(10,CANVAS_SIZE),random(10,CANVAS_SIZE)),10, foodGenerator.generate()));                
         }
         if (shouldGenerateBoid())
         {
             flock.boids.push(new Car(createVector(random(10,CANVAS_SIZE),
                               random(10,CANVAS_SIZE)),5,10,LIFE_LIMIT_FOR_ENTITIES));    
         }
-        tickCounter=0;        
+        tickCounter=0;    
+        console.log(flock.boids[0].foodCounts)            ;
     }    
 }
 
