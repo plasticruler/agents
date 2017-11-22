@@ -1,21 +1,23 @@
 
-class Car {
+class Creature {
     constructor(position, w, l, lifeLimit, chromoSomes) {
-        this.chromoSomes = {'FOOD_SEARCH_DISTANCE':random(30,80),
-                            'TOP_SPEED':2.0,
-                            'MAX_FORCE':random(0.05, 0.08),
-                            'FLOCK_BEHAVIOUR':0, 
-                            'MOUTH_SIZE':random(5,8),
-                            'FOOD_PREFERANCE':random(0,3),
-                            'ENDURANCE_FACTOR':random(0.95,1.05)} || chromoSomes;
+        this.chromoSomes = {
+            'FOOD_SEARCH_DISTANCE': random(30, 80),
+            'TOP_SPEED': 2.0,
+            'MAX_FORCE': random(0.05, 0.08),
+            'FLOCK_BEHAVIOUR': 0,
+            'MOUTH_SIZE': random(5, 8),
+            'FOOD_PREFERANCE': random(0, 3),
+            'ENDURANCE_FACTOR': random(0.95, 1.05)
+        } || chromoSomes;
 
         this.topspeed = this.chromoSomes.TOP_SPEED;
         this.maxForce = this.chromoSomes.MAX_FORCE;
         this.seeFoodDistance = this.chromoSomes.FOOD_SEARCH_DISTANCE; //not shared                
-        this.mouthSize= this.chromoSomes.MOUTH_SIZE;
+        this.mouthSize = this.chromoSomes.MOUTH_SIZE;
         this.enduranceFactor = this.ENDURANCE_FACTOR; //does hunger make him weaker or stronger?
         this.flockBehaviour = this.FLOCK_BEHAVIOUR;
-        
+
         this.position = position;
         this.velocity = createVector(random(-1, 2), random(-1, 2));
         this.acceleration = createVector(0, 0);
@@ -27,42 +29,47 @@ class Car {
         this.start = new Date();
         this.tickCounter = 0;
         this.cycleAge = 0;
-        this.totalAge=0;
+        this.totalAge = 0;
         this.lifeLimit = lifeLimit || 25;
-        this.isDead = false;    
-        this.foodCounts = {};                   
+        this.isDead = false;
+        this.foodCounts = {};
+
+        this.drawFactory = new drawFactory();
     }
-    returnTrueXPercentUniform(x){
-        return random(0,1) < x;
+    returnTrueXPercentUniform(x) {
+        return random(0, 1) < x;
     }
-    mate(c){ //returns a baby produced as a result of a crossing between c and this
+    mate(c) { //returns a baby produced as a result of a crossing between c and this
 
     }
-    getMutation(){
+    getMutation() {
         var MUTATION_RATE = 0.05;
         var GENOME_PRESERVATION_RATE = 0.2;
-        if ( this.returnTrueXPercentUniform(MUTATION_RATE)) //5% change of mutation appearing
+        if (this.returnTrueXPercentUniform(MUTATION_RATE)) //5% change of mutation appearing
         {
-            return {'FOOD_SEARCH_DISTANCE': this.returnTrueXPercentUniform(GENOME_PRESERVATION_RATE)?random(30,80):this.chromoSomes.FOOD_SEARCH_DISTANCE, //20% of a something 'new'
-                            'FOOD_PREFERANCE':this.returnTrueXPercentUniform(GENOME_PRESERVATION_RATE)?random(0,4):this.chromoSomes.FOOD_PREFERANCE,
-                            'TOP_SPEED':this.returnTrueXPercentUniform(GENOME_PRESERVATION_RATE)?random(2,4):this.chromoSomes.TOP_SPEED,
-                            'MAX_FORCE':this.returnTrueXPercentUniform(GENOME_PRESERVATION_RATE)?random(0.05, 0.08):this.chromoSomes.MAX_FORCE,
-                            'FLOCK_BEHAVIOUR':this.returnTrueXPercentUniform(GENOME_PRESERVATION_RATE)?Math.floor(random(1,3)):this.chromoSomes.FLOCK_BEHAVIOUR, 
-                            'MOUTH_SIZE':this.returnTrueXPercentUniform(GENOME_PRESERVATION_RATE)?Math.floor(random(5,8)):this.chromoSomes.MOUTH_SIZE,
-                            'ENDURANCE_FACTOR':this.returnTrueXPercentUniform(GENOME_PRESERVATION_RATE)?random(0.95,1.05):this.chromoSomes.ENDURANCE_FACTOR} ;
+            return {
+                'FOOD_SEARCH_DISTANCE': this.returnTrueXPercentUniform(GENOME_PRESERVATION_RATE) ? random(30, 80) : this.chromoSomes.FOOD_SEARCH_DISTANCE, //20% of a something 'new'
+                'FOOD_PREFERANCE': this.returnTrueXPercentUniform(GENOME_PRESERVATION_RATE) ? random(0, 4) : this.chromoSomes.FOOD_PREFERANCE,
+                'TOP_SPEED': this.returnTrueXPercentUniform(GENOME_PRESERVATION_RATE) ? random(2, 4) : this.chromoSomes.TOP_SPEED,
+                'MAX_FORCE': this.returnTrueXPercentUniform(GENOME_PRESERVATION_RATE) ? random(0.05, 0.08) : this.chromoSomes.MAX_FORCE,
+                'FLOCK_BEHAVIOUR': this.returnTrueXPercentUniform(GENOME_PRESERVATION_RATE) ? Math.floor(random(1, 3)) : this.chromoSomes.FLOCK_BEHAVIOUR,
+                'MOUTH_SIZE': this.returnTrueXPercentUniform(GENOME_PRESERVATION_RATE) ? Math.floor(random(5, 8)) : this.chromoSomes.MOUTH_SIZE,
+                'ENDURANCE_FACTOR': this.returnTrueXPercentUniform(GENOME_PRESERVATION_RATE) ? random(0.95, 1.05) : this.chromoSomes.ENDURANCE_FACTOR
+            };
         }
-        else
-        {
-             return {'FOOD_SEARCH_DISTANCE':this.chromoSomes.FOOD_SEARCH_DISTANCE,
-                     'TOP_SPEED':this.chromoSomes.TOP_SPEED,
-                     'MAX_FORCE':this.chromoSomes.MAX_FORCE,
-                     'FLOCK_BEHAVIOUR':this.chromoSomes.FLOCK_BEHAVIOUR, 
-                     'MOUTH_SIZE':this.chromoSomes.MOUTH_SIZE,
-                     'FOOD_PREFERANCE':this.chromoSomes.FOOD_PREFERANCE,
-                     'ENDURANCE_FACTOR':this.chromoSomes.ENDURANCE_FACTOR};
+        else {
+            return {
+                'FOOD_SEARCH_DISTANCE': this.chromoSomes.FOOD_SEARCH_DISTANCE,
+                'TOP_SPEED': this.chromoSomes.TOP_SPEED,
+                'MAX_FORCE': this.chromoSomes.MAX_FORCE,
+                'FLOCK_BEHAVIOUR': this.chromoSomes.FLOCK_BEHAVIOUR,
+                'MOUTH_SIZE': this.chromoSomes.MOUTH_SIZE,
+                'FOOD_PREFERANCE': this.chromoSomes.FOOD_PREFERANCE,
+                'ENDURANCE_FACTOR': this.chromoSomes.ENDURANCE_FACTOR
+            };
         }
     }
-    fitnessScore(){
+    fitnessScore() {
         return this.cycleAge; //because it has survived for so long must mean it's strong
     }
     applyForce(force) {
@@ -70,7 +77,7 @@ class Car {
     }
 
     isInCircle(target, radius) { //OK               
-        return  this.position.dist(target.position) < radius/2.0;
+        return this.position.dist(target.position) < radius / 2.0;
     }
 
     borders() { //OK
@@ -80,8 +87,8 @@ class Car {
         if (this.position.y > height + this.l) this.position.y = -this.l;
     }
 
-    run(f, t, obstacles,food) {
-        this.flock(f, t, obstacles,food);
+    run(f, t, obstacles, food) {
+        this.flock(f, t, obstacles, food);
         this.update();
         this.borders();
         this.display(f);
@@ -94,9 +101,9 @@ class Car {
         let seperationDistance = 25;
         let alignmentDistance = 50;
         let cohesionDistance = 40;
-        let continueFlockingWhileHungry=false;
-        this.foodTree=foodTree;
-        
+        let continueFlockingWhileHungry = false;
+        this.foodTree = foodTree;
+
         this.eatWhatItCan();
         if (f) {
             if (f.followMouse) {
@@ -109,7 +116,7 @@ class Car {
             alignmentDistance = f.ad;
             cohesionDistance = f.cd;
             avoidanceRatio = f.avoidanceRatio;
-            continueFlockingWhileHungry=f.continueFlockingWhileHungry;
+            continueFlockingWhileHungry = f.continueFlockingWhileHungry;
         }
         this.seperationDistance = seperationDistance;
         this.alignmentDistance = alignmentDistance;
@@ -126,60 +133,56 @@ class Car {
         av.mult(avoidanceRatio);
         this.applyForce(av); //aboid obstacles        
 
-        if (this.isHungry())
-        {
-            
+        if (this.isHungry()) {
+
             this.seekFood(foodTree)
             if (!continueFlockingWhileHungry)
                 return; //forget about flocking
-        }                            
+        }
         this.applyForce(sep);
         this.applyForce(ali);
         this.applyForce(coh);
     }
-    eatWhatItCan(){        
+    eatWhatItCan() {
         if (!this.isHungry())
             return;
-        var items = this.foodTree.findAll(this.position.x,this.position.y,this.seeFoodDistance);                
-        if (items.length>0)
-        {            
-            if (this.isInCircle(items[0],this.mouthSize) && items[0].isAlive()) //only eat available food
-            {                                
+        var items = this.foodTree.findAll(this.position.x, this.position.y, this.seeFoodDistance);
+        if (items.length > 0) {
+            if (this.isInCircle(items[0], this.mouthSize) && items[0].isAlive()) //only eat available food
+            {
                 //we want to keep track of how many of what food type it ate
                 //so that we can build a frequency map which will be used for preference development later on
                 //we will use a threshold that will initiate the learning..
-                this.cycleAge-=items[0].getFoodValue();                              
+                this.cycleAge -= items[0].getFoodValue();
                 if (!(items[0].eatableType in this.foodCounts))
-                    this.foodCounts[items[0].eatableType]=0;                
+                    this.foodCounts[items[0].eatableType] = 0;
                 this.foodCounts[items[0].eatableType]++;//increment count of what was eaten                
-                items[0].kill();                                                      
-            }                
-        }       
+                items[0].kill();
+            }
+        }
     }
-    isHungry(){
+    isHungry() {
         return this.energyLevel() < 0.80;
     }
-    energyLevel(){
-        return (this.lifeLimit-this.cycleAge) / this.lifeLimit;
+    energyLevel() {
+        return (this.lifeLimit - this.cycleAge) / this.lifeLimit;
     }
     seekFood() { //will seek food if hungry        
         if (this.isHungry()) {
-               
-            var foodItems = this.foodTree.findAll(this.position.x,this.position.y,this.seeFoodDistance);            
-            if (foodItems.length===0)
-                return false;            
 
-            foodItems.forEach((f)=>
-            {                
+            var foodItems = this.foodTree.findAll(this.position.x, this.position.y, this.seeFoodDistance);
+            if (foodItems.length === 0)
+                return false;
+
+            foodItems.forEach((f) => {
                 //if (this.isInCircle(f,this.seeFoodDistance))
                 //    f.eatableType=1;//change colour of food to show it has been 'seen;
             })
-            
-            
-            if (this.isInCircle(foodItems[0],this.seeFoodDistance))
-            {                
-                this.applyForce(this.seek(foodItems[0].position, this.topspeed*this.energyLevel(),this.maxForce*2.0)); //this should become a force taking into account 'attractive' power of the food, and also how much enery the boid has
-                line(this.position.x,this.position.y,foodItems[0].position.x,foodItems[0].position.y )
+
+
+            if (this.isInCircle(foodItems[0], this.seeFoodDistance)) {
+                this.applyForce(this.seek(foodItems[0].position, this.topspeed * this.energyLevel(), this.maxForce * 2.0)); //this should become a force taking into account 'attractive' power of the food, and also how much enery the boid has
+                line(this.position.x, this.position.y, foodItems[0].position.x, foodItems[0].position.y)
             }
             return true;
         }
@@ -215,13 +218,13 @@ class Car {
             return createVector(0, 0);
         }
     }
-    seek(target,speed,force) { //OK        
+    seek(target, speed, force) { //OK        
         var desired = p5.Vector.sub(target, this.position);
         desired.normalize();
-        desired.mult(speed||this.topspeed);
+        desired.mult(speed || this.topspeed);
 
         var steer = p5.Vector.sub(desired, this.velocity);
-        steer.limit(force||this.maxForce);
+        steer.limit(force || this.maxForce);
         return steer;
     }
     cohesion(cars, a) { //OK
@@ -326,69 +329,12 @@ class Car {
         if (this.cycleAge > this.lifeLimit - 1) {
             this.isDead = true;
         }
-        
-        
+
+
     }
-    display(f) {
-        var direction = this.velocity.heading() - 90;
-        this.rotation = direction;
+    display(config) {
         this.updateInternals(this.foodTree);
-        push();        
-        noFill();
-        translate(this.position.x, this.position.y);  //make the origin 0,0
-        strokeWeight(1);
-        rotate(this.rotation);
-        if (f.showSeperationDistance) {
-            stroke('red');
-            ellipse(0, 0, this.seperationDistance);
-        }
-        if (f.showAlignmentDistance) {
-            stroke('yellow');
-            ellipse(0, 0, this.alignmentDistance);
-        }
-        if (f.showCohesionDistance) {
-            stroke('green');
-            ellipse(0, 0, this.cohesionDistance);
-        }
-        if (f.showFoodDistance)
-        {
-            stroke('orange');
-            ellipse(0, 0, this.seeFoodDistance);
-        }
-        
-
-        if (f.showMouthSize)
-        {
-            stroke('blue');        
-            ellipse(0, 0, this.mouthSize);
-        }
-        
-
-        fill(this.colour);
-        if (this.isHungry())
-            fill('red');
-
-        stroke('white');
-        let h = Math.sqrt(Math.pow(this.l, 2) - (Math.pow(this.w / 2.0, 2)));
-        beginShape(TRIANGLES);
-        vertex(0, h);
-        vertex(-this.w / 2, -h / 2);
-        vertex(this.w / 2, -h / 2);
-        endShape();
-        //rect(-this.w/2,-this.l/2, this.w,this.l);                                                                            
-
-        line(-Math.floor(this.w / 2) - Math.floor(0.3 * this.w),
-            -Math.floor(this.l / 2) - 1,
-            Math.floor(this.w / 2) + Math.floor(0.3 * this.w),
-            -Math.floor(this.l / 2) - 1);
-
-        line(0, 0, 0, Math.floor(-this.l));
-
-        if (f.showCentre) {
-            strokeWeight(4);
-            stroke('red');
-            point(0, 0);
-        }
-        pop();
+        this.drawFactory.drawBoid(this, config);
+        return;
     }
 }

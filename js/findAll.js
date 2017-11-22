@@ -1,18 +1,18 @@
-tree_findAll = function(x, y, radius, aF, eF) {
+tree_findAll = function (x, y, radius, aF, eF) {
   var data,
-      x0 = this._x0,
-      y0 = this._y0,
-      x1,
-      y1,
-      x2,
-      y2,
-      x3 = this._x1,
-      y3 = this._y1,
-      quads = [],
-      node = this._root,
-      q,
-      i,
-      result = [];
+    x0 = this._x0,
+    y0 = this._y0,
+    x1,
+    y1,
+    x2,
+    y2,
+    x3 = this._x1,
+    y3 = this._y1,
+    quads = [],
+    node = this._root,
+    q,
+    i,
+    result = [];
 
   if (node) quads.push(new Quad(node, x0, y0, x3, y3));
   if (radius == null) radius = Infinity;
@@ -26,15 +26,15 @@ tree_findAll = function(x, y, radius, aF, eF) {
 
     // Stop searching if this quadrant can’t contain a closer node.
     if (!(node = q.node)
-        || (x1 = q.x0) > x3
-        || (y1 = q.y0) > y3
-        || (x2 = q.x1) < x0
-        || (y2 = q.y1) < y0) continue;
+      || (x1 = q.x0) > x3
+      || (y1 = q.y0) > y3
+      || (x2 = q.x1) < x0
+      || (y2 = q.y1) < y0) continue;
 
     // Bisect the current quadrant.
     if (node.length) {
       var xm = (x1 + x2) / 2,
-          ym = (y1 + y2) / 2;
+        ym = (y1 + y2) / 2;
 
       quads.push(
         new Quad(node[3], xm, ym, x2, y2),
@@ -55,13 +55,13 @@ tree_findAll = function(x, y, radius, aF, eF) {
     else {
       if (eF) eF(node.data);
       var dx = x - +this._x.call(null, node.data),
-          dy = y - +this._y.call(null, node.data),
-          d2 = dx * dx + dy * dy;
+        dy = y - +this._y.call(null, node.data),
+        d2 = dx * dx + dy * dy;
       if (d2 < radius) {
         do {
           if (aF) aF(node.data);
           result.push(node.data);
-        } 
+        }
         while (node = node.next);
       }
     }

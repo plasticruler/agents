@@ -1,4 +1,5 @@
-class randombyfrequency{
+
+class RandomByFrequency{
     constructor(d){        
         this.d  = d;        
         //console.log(this.d);
