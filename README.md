@@ -1,9 +1,9 @@
 # agent experiments
 Experiments in programming an autonamous agent.
 
-View live [here](https://skrillex581.github.io/agents/).
+View live [here](https://plasticruler.github.io/agents/).
 
-![alt tag](https://raw.githubusercontent.com/skrillex581/agents/master/agents.gif)
+![alt tag](https://raw.githubusercontent.com/plasticruler/agents/master/agents.gif)
 
 Most of the code comes from watching the videos in [this](https://www.youtube.com/playlist?list=PLRqwX-V7Uu6YHt0dtyf4uiw8tKOxQLvlW) playlist. All I did was rewrite most of it but used ES2015 and added some features to improve my conceptual understanding of the principles.
 
