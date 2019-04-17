@@ -1,5 +1,5 @@
 # agent experiments
-Experiments in programming an autonamous agent.
+Experiments in programming an autonamous agent. (Sorry, this code is really bad). 
 
 View live [here](https://plasticruler.github.io/agents/).
 
